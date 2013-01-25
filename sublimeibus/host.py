@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import time
+import json
 import logging
 from os.path import join
 from async import ProcessChat
@@ -18,22 +19,24 @@ class ChatDelegate(ProcessChat):
 
 class Agent(object):
     def __init__(self):
-        self.runner = None
+        self.chat = None
         self.callback = None
+        self.logger = logging.getLogger('Agent')
 
     def register_callback(self, callback):
         self.callback = callback
 
     def start(self, agent_dir):
         self.agent_dir = agent_dir
-        if self.runner is None:
-            self.runner = ChatDelegate(self)
-            self.runner.start(["python", "-u", join(agent_dir, "sublime-ibus-agent.py")])
+        if self.chat is None:
+            self.chat = ChatDelegate(self)
+            self.chat.set_terminator('\n')
+            self.chat.start(["python", "-u", join(agent_dir, "sublime-ibus-agent.py")])
 
     def stop(self):
-        if self.runner is not None:
-            self.runner.stop()
-            self.runner = None
+        if self.chat is not None:
+            self.chat.stop()
+            self.chat = None
 
     def restart(self, agent_dir):
         self.stop()
@@ -42,7 +45,7 @@ class Agent(object):
     def setup(self):
         self.push('list_active_engines()\n')
         self.push('create_imcontext()\n')
-        # self.push('start_focus_observation(1000)\n')
+        self.push('start_focus_observation(1000)\n')
         # self.push('set_engine(0, "anthy")\n')
         # self.push('process_key_event(0, 0x61, 0, False)\n')
         self.push('focus_in(0)\n')
@@ -51,7 +54,8 @@ class Agent(object):
         # self.push('set_cursor_location(0, 100, 100, 0, 14)\n')
 
     def push(self, data):
-        self.runner.push(data)
+        self.logger.debug('push %s', repr(data))
+        self.chat.push(data)
 
     def feedkeys(self, keys):
         for k in keys:
@@ -65,17 +69,26 @@ agent = Agent()
 
 
 def on_data(data):
-    print(data.rstrip('\r\n').lstrip('\r\n'))
+    if data.find('{') != 0:
+        print 'message:', data
+    else:
+        try:
+            print(json.loads(data))
+        except ValueError as e:
+            print 'error:', e
+            print(repr(data))
+            print ''
 
 
 def main():
     logging.basicConfig(level=logging.DEBUG)
     agent.register_callback(on_data)
     agent.start(os.getcwd())
-    time.sleep(2)
+    time.sleep(1)
     agent.setup()
+    # time.sleep(1)
     agent.feedkeys('aiu')
-    time.sleep(3)
+    time.sleep(1)
     agent.stop()
 
 

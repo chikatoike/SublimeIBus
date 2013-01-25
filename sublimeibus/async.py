@@ -107,7 +107,6 @@ class ProcessChat(object):
     def __init__(self):
         self.async = None
         self.received_data = []
-        self.set_terminator('\n')
         self.logger = logging.getLogger('ProcessChat')
 
     def start(self, cmd):
@@ -138,14 +137,17 @@ class ProcessChat(object):
     def handle_read(self, data):
         buf = data
         terminator = self.get_terminator()
-        index = buf.find(terminator)
-        if index != -1:
-            if index > 0:
-                self.collect_incoming_data(buf[:index])
-            self.found_terminator()
-            self.collect_incoming_data(buf[index + len(terminator):])
-        else:
-            self.collect_incoming_data(buf)
+
+        while True:
+            index = buf.find(terminator)
+            if index != -1:
+                if index > 0:
+                    self.collect_incoming_data(buf[:index])
+                self.found_terminator()
+                buf = buf[index + len(terminator):]
+            else:
+                self.collect_incoming_data(buf)
+                break
 
     def collect_incoming_data(self, data):
         self.received_data.append(data)
@@ -174,6 +176,7 @@ def main():
     import time
     logging.basicConfig(level=logging.DEBUG)
     p = ProcessChat()
+    p.set_terminator('\n')
     p.start(["python", "-u", "sublime-ibus-agent.py"])
     time.sleep(1)
     p.push('list_active_engines()\n')
