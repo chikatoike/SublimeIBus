@@ -88,10 +88,21 @@
 
 import sys
 import glib
-import re
+import json
 
 import ibus
 from ibus import modifier
+
+
+def printj(dic):
+    print(json.dumps(dic))
+
+def print_command(command, *args):
+    printj({'command': command, 'args': args})
+
+def print_message(message):
+    printj({'message': message})
+
 
 ########################################################################
 # Process command line option
@@ -116,7 +127,7 @@ if __name__ == "__main__":
     if options.surrounding_text \
             and map(int, ibus.get_version().split(".")) >= [1, 4, 0]:
         use_surrounding_text = True
-        print "Surrounding text support enabled"
+        print_message('Surrounding text support enabled')
 
 ########################################################################
 # Setup Xlib
@@ -127,7 +138,7 @@ try:
     import Xlib.X
     import Xlib.Xatom
 except ImportError:
-    print "python-xlib library is required"
+    print_message('python-xlib library is required')
     exit(1)
 
 class Frame(object):
@@ -147,9 +158,9 @@ class Frame(object):
     # BadWIndow error unwantedly.  This handler quiets all Xlib's errors,
     # but we still can check them in "*ibus-mode log*" buffer if necessary.
     def __error_handler(self, error, request):
-        print '("%s")'%("%s"%error).replace('"', '\\"')
+        print_command('error', error)
 
-    def __update_focus_cb(self, form, sync=False):
+    def __update_focus_cb(self, command, sync=False):
         # Check FocusIn/FocusOut events
         if self.focus:
             focus_in = None
@@ -168,9 +179,9 @@ class Frame(object):
                     # If old version of ibus.el which doesn't define
                     # `ibus-redo-focus-in-cb' is running on Emacs, the
                     # following message will just be ignored and take no effect.
-                    print '(ibus-redo-focus-in-cb)'
+                    print_command('ibus_redo_focus_in_cb')
                 if sync:
-                    print form % focus_in.id
+                    print_command(command, focus_in.id)
                 return True
         # Main part
         focus = self.display.get_input_focus().focus
@@ -184,20 +195,20 @@ class Frame(object):
                 if not (focus.get_wm_class() or focus.get_wm_name()):
                     focus = tree.parent
                 if focus != self.focus or sync:
-                    print form % focus.id
+                    print_command(command, focus.id)
                     focus.change_attributes(event_mask=Xlib.X.FocusChangeMask)
                     self.focus = focus
                 return True
         except AttributeError:
             if sync:
-                print form % 0
+                print_command(command, 0)
             return True
         # Fallback
         atom = display.get_atom("_NET_ACTIVE_WINDOW", True)
         focus_id = tree.root.get_property(atom, Xlib.Xatom.WINDOW, 0, 1).value[0]
         focus = display.create_resource_object("window", focus_id)
         if focus != self.focus or sync:
-            print form % focus_id
+            print_command(command, focus_id)
             focus.change_attributes(event_mask=Xlib.X.FocusChangeMask)
             self.focus = focus
         return True
@@ -210,9 +221,9 @@ class Frame(object):
 
     def start_focus_observation(self, interval):
         self.stop_focus_observation()
-        self.__update_focus_cb("(ibus-start-focus-observation-cb %d)", True)
+        self.__update_focus_cb('ibus_start_focus_observation_cb', True)
         self.focus_cb_id = glib.timeout_add(interval, self.__update_focus_cb,
-                                            "(ibus-focus-changed-cb %d)")
+                                            'ibus_focus_changed_cb')
 
     def update_coordinates(self):
         if self.window:
@@ -243,9 +254,9 @@ try:
     bus = ibus.Bus()
 except:
     if not start_ibus_daemon:
-        print '(error "ibus-daemon is not running")'
+        print_command('error', 'ibus-daemon is not running')
         exit(1)
-    print "Launch IBus daemon..."
+    print_message('Launch IBus daemon...')
     import os
     import time
     if os.spawnlp(os.P_WAIT, "ibus-daemon", "ibus-daemon", "-dx") == 0:
@@ -257,23 +268,11 @@ except:
             except:
                 pass
         else:
-            print '(error "Failed to connect with ibus-daemon")'
+            print_command('error', 'Failed to connect with ibus-daemon')
             exit(1)
     else:
-        print '(error "Failed to launch ibus-daemon")'
+        print_command('error', 'Failed to launch ibus-daemon')
         exit(1)
-
-########################################################################
-# Miscellaneous functions
-########################################################################
-
-def lisp_boolean(boolean):
-    return "t" if boolean else "nil"
-
-escape_regexp = re.compile(ur'(["\\])')
-
-def escape_string(string):
-    return escape_regexp.sub(ur'\\\1', string)
 
 ########################################################################
 # Input Context
@@ -321,8 +320,8 @@ class IBusELInputContext(ibus.InputContext):
 ########################################################################
 
 def commit_text_cb(ic, text):
-    print '(ibus-commit-text-cb %d "%s")'% \
-        (ic.id_no, escape_string(text.text).encode("utf-8"))
+    print_command('ibus_commit_text_cb',
+        ic.id_no, text.text.encode("utf-8"))
 
 def update_preedit_text_cb(ic, text, cursor_pos, visible):
     preediting = len(text.text) > 0
@@ -331,27 +330,26 @@ def update_preedit_text_cb(ic, text, cursor_pos, visible):
                  (["nil", "'underline", "'foreground", "'background"][attr.type],
                   attr.value & 0xffffff, attr.start_index, attr.end_index)
                  for attr in text.attributes]
-        print '(ibus-update-preedit-text-cb %d "%s" %d %s %s)'% \
-            (ic.id_no, escape_string(text.text).encode("utf-8"),
-             cursor_pos, lisp_boolean(visible), ' '.join(attrs))
+        print_command('ibus_update_preedit_text_cb',
+            ic.id_no, text.text.encode("utf-8"),
+            cursor_pos, visible, ' '.join(attrs))
     ic.preediting = preediting
 
 def show_preedit_text_cb(ic):
-    print '(ibus-show-preedit-text-cb %d)'%(ic.id_no)
+    print_command('ibus_show_preedit_text_cb', ic.id_no)
 
 def hide_preedit_text_cb(ic):
-    print '(ibus-hide-preedit-text-cb %d)'%(ic.id_no)
+    print_command('ibus_hide_preedit_text_cb', ic.id_no)
 
 def update_auxiliary_text_cb(ic, text, visible):
-    print '(ibus-update-auxiliary-text-cb %d "%s" %s)'% \
-        (ic.id_no, escape_string(text.text).encode("utf-8"),
-         lisp_boolean(visible))
+    print_command('ibus_update_auxiliary_text_cb',
+        ic.id_no, text.text.encode("utf-8"), visible)
 
 def show_auxiliary_text_cb(ic):
-    print '(ibus-show-auxiliary-text-cb %d)'%(ic.id_no)
+    print_command('ibus_show_auxiliary_text_cb', ic.id_no)
 
 def hide_auxiliary_text_cb(ic):
-    print '(ibus-hide-auxiliary-text-cb %d)'%(ic.id_no)
+    print_command('ibus_hide_auxiliary_text_cb', ic.id_no)
 
 def update_lookup_table_cb(ic, lookup_table, visible):
     ic.lookup_table = lookup_table
@@ -361,44 +359,42 @@ def update_lookup_table_cb(ic, lookup_table, visible):
         self.__hide_lookup_table_cb(ic)
 
 def show_lookup_table_cb(ic):
-    print "(ibus-show-lookup-table-cb %d '(%s) %s)"% \
-        (ic.id_no, escape_string(
-            " ".join(map(lambda item : '"%s"'%item.text,
-                         ic.lookup_table.get_candidates_in_current_page())
-                     )).encode("utf-8"),
-         ic.lookup_table.get_cursor_pos_in_current_page())
+    print_command('ibus_show_lookup_table_cb',
+        ic.id_no,
+        [item.text for item in ic.lookup_table.get_candidates_in_current_page()],
+        ic.lookup_table.get_cursor_pos_in_current_page())
 
 def hide_lookup_table_cb(ic):
-    print '(ibus-hide-lookup-table-cb %d)'%(ic.id_no)
+    print_command('ibus_hide_lookup_table_cb', ic.id_no)
 
 def page_up_lookup_table_cb(ic):
-    print '(ibus-log "page up lookup table")'
+    print_command('ibus_log', 'page up lookup table')
 
 def page_down_lookup_table_cb(ic):
-    print '(ibus-log "page down lookup table")'
+    print_command('ibus_log', 'page down lookup table')
 
 def cursor_up_lookup_table_cb(ic):
-    print '(ibus-log "cursor up lookup table")'
+    print_command('ibus_log', 'cursor up lookup table')
 
 def cursor_down_lookup_table_cb(ic):
-    print '(ibus-log "cursor down lookup table")'
+    print_command('ibus_log', 'cursor down lookup table')
 
 def enabled_cb(ic):
-    print '(ibus-status-changed-cb %d "%s")'%(ic.id_no, ic.get_engine().name)
+    print_command('ibus_status_changed_cb', ic.id_no, ic.get_engine().name)
     ic.surrouding_text_received = False
 
 def disabled_cb(ic):
-    print '(ibus-status-changed-cb %d nil)'%ic.id_no
+    print_command('ibus_status_changed_cb', ic.id_no, None)
     ic.surrouding_text_received = False
 
 def forward_key_event_cb(ic, keyval, keycode, modifiers):
-    print '(ibus-forward-key-event-cb %d %d %d %s)'% \
-        (ic.id_no, keyval, modifiers & ~modifier.RELEASE_MASK,
-         lisp_boolean(modifiers & modifier.RELEASE_MASK == 0))
+    print_command('ibus_forward_key_event_cb',
+        ic.id_no, keyval, modifiers & ~modifier.RELEASE_MASK,
+        (modifiers & modifier.RELEASE_MASK == 0))
 
 def delete_surrounding_text_cb(ic, offset, n_chars):
-    print '(ibus-delete-surrounding-text-cb %d %d %d)'% \
-        (ic.id_no, offset, n_chars)
+    print_command('ibus_delete_surrounding_text_cb',
+        ic.id_no, offset, n_chars)
 
 ########################################################################
 # Process methods from client
@@ -415,7 +411,7 @@ def create_imcontext():
         ic.id_no = len(imcontexts)
         imcontexts.append(ic)
     ic.set_capabilities(int('101001' if use_surrounding_text else '001001',2))
-    print '(ibus-create-imcontext-cb %d)'%ic.id_no
+    print_command('ibus_create_imcontext_cb', ic.id_no)
 
 def destroy_imcontext(id_no):
     imcontexts[id_no].destroy()
@@ -431,14 +427,14 @@ def process_key_event(id_no, keyval, modmask, backslash, pressed = None):
                                 - display.display.info.min_keycode + 1))
 
     def reply(id_no, handled):
-        print '(ibus-process-key-event-cb %d %s)'%(id_no, lisp_boolean(handled))
+        print_command('ibus_process_key_event_cb', id_no, handled)
         return False
 
     ic = imcontexts[id_no]
     if use_surrounding_text and pressed != False \
             and ic.needs_surrounding_text() and not ic.surrouding_text_received:
-        print '(ibus-query-surrounding-text-cb %d %d ?\\x%x "%s" "%s")'% \
-            (id_no, keyval, modmask, backslash, pressed)
+        print_command('ibus_query_surrounding_text_cb',
+            id_no, keyval, modmask, backslash, pressed)
         return
 
     if backslash:
@@ -490,7 +486,7 @@ def focus_in(id_no):
 
 def focus_out(id_no):
     imcontexts[id_no].focus_out()
-    print '()' # Dummy response
+    print '{}'  # Dummy response
 
 def reset(id_no):
     imcontexts[id_no].reset()
@@ -526,8 +522,7 @@ def stop_focus_observation():
     frame.stop_focus_observation()
 
 def list_active_engines():
-    print "(ibus-list-active-engines-cb '(%s))"% \
-        ' '.join('"%s"'%i.name for i in bus.list_active_engines())
+    print_command('ibus_list_active_engines_cb', [i.name for i in bus.list_active_engines()])
 
 ########################################################################
 # Main loop
@@ -540,14 +535,14 @@ class IBusModeMainLoop(glib.MainLoop):
         bus.connect("disconnected", self.__disconnected_cb)
 
     def __disconnected_cb(self, *args):
-        print '(ibus-log "disconnected")'
+        print_command('ibus_log', 'disconnected')
         exit()
 
     def __start_cb(self):
-        print '(setq ibus-version "%s")'%ibus.get_version()
-        print '(setq started t)'
-        print 'Agent successfully started for display "%s"'% \
-            display.get_display_name()
+        print_command('setq', 'ibus_version', ibus.get_version())
+        print_command('setq', 'started', True)
+        print_message('Agent successfully started for display "%s"'% \
+            display.get_display_name())
         return False
 
     def __stdin_cb(self, fd, condition):
@@ -555,7 +550,7 @@ class IBusModeMainLoop(glib.MainLoop):
             exec sys.stdin.readline()
         except:
             import traceback
-            print '(error "%s")'%traceback.format_exc().replace('"', '\\"')
+            print_command('setq', 'error', traceback.format_exc())
         return True
 
     def run(self):
@@ -566,7 +561,7 @@ class IBusModeMainLoop(glib.MainLoop):
                 super(IBusModeMainLoop, self).run()
             except:
                 import traceback
-                print '(error "%s")'%traceback.format_exc().replace('"', '\\"')
+                print_command('setq', 'error', traceback.format_exc())
             else:
                 break
         for ic in imcontexts:
