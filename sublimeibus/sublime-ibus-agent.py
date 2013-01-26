@@ -553,9 +553,13 @@ class IBusModeMainLoop(glib.MainLoop):
             print_command('setq', 'error', traceback.format_exc())
         return True
 
+    def __io_error_cb(self, fd, condition):
+        exit()
+
     def run(self):
         glib.idle_add(self.__start_cb)
         glib.io_add_watch(0, glib.IO_IN, self.__stdin_cb)
+        glib.io_add_watch(0, glib.IO_ERR | glib.IO_HUP, self.__io_error_cb)
         while True:
             try:
                 super(IBusModeMainLoop, self).run()
@@ -567,7 +571,6 @@ class IBusModeMainLoop(glib.MainLoop):
         for ic in imcontexts:
             if ic:
                 ic.destroy()
-
 
 if __name__ == "__main__":
 
