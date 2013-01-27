@@ -547,10 +547,12 @@ class IBusModeMainLoop(glib.MainLoop):
 
     def __stdin_cb(self, fd, condition):
         try:
-            exec sys.stdin.readline()
+            expr = sys.stdin.readline()
+            exec expr
         except:
             import traceback
-            print_command('setq', 'error', traceback.format_exc())
+            print_command('error', 'error expr: ' + expr)
+            print_command('error', traceback.format_exc())
         return True
 
     def __io_error_cb(self, fd, condition):
@@ -565,7 +567,7 @@ class IBusModeMainLoop(glib.MainLoop):
                 super(IBusModeMainLoop, self).run()
             except:
                 import traceback
-                print_command('setq', 'error', traceback.format_exc())
+                print_command('error', traceback.format_exc())
             else:
                 break
         for ic in imcontexts:
