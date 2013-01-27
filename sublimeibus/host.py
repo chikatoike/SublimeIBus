@@ -50,7 +50,6 @@ class Agent(object):
         # self.push('process_key_event(0, 0x61, 0, False)\n')
         self.push('focus_in(0)\n')
         # self.push('update_frame_coordinates(50331843)\n')
-        self.push('enable(0)\n')
         # self.push('set_cursor_location(0, 100, 100, 0, 14)\n')
 
     def push(self, data):
@@ -62,7 +61,7 @@ class Agent(object):
             if not isinstance(k, int):
                 k = ord(k)
             self.push('process_key_event(0, %d, 0, None, None)\n' % k)
-            self.push('set_surrounding_text(0, "", 0, 0)\n')
+            # self.push('set_surrounding_text(0, "", 0, 0)\n')
 
 
 agent = Agent()
@@ -70,14 +69,13 @@ agent = Agent()
 
 def on_data(data):
     if data.find('{') != 0:
-        print 'message:', data
+        print('message: ' + data)
     else:
         try:
             print(json.loads(data))
         except ValueError as e:
-            print 'error:', e
+            print('error: ' + e)
             print(repr(data))
-            print ''
 
 
 def main():
@@ -87,9 +85,12 @@ def main():
     time.sleep(1)
     agent.setup()
     # time.sleep(1)
+    agent.push('enable(0)\n')
     agent.feedkeys('aiu')
     time.sleep(1)
-    agent.stop()
+    # agent.stop()
+    agent.chat.async.proc.stdin.close()
+    agent.chat.async.proc.wait()
 
 
 if __name__ == "__main__":
