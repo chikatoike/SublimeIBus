@@ -402,6 +402,14 @@ def delete_surrounding_text_cb(ic, offset, n_chars):
 
 imcontexts = []
 
+IBUS_CAP_PREEDIT_TEXT       = 1 << 0
+IBUS_CAP_AUXILIARY_TEXT     = 1 << 1
+IBUS_CAP_LOOKUP_TABLE       = 1 << 2
+IBUS_CAP_FOCUS              = 1 << 3
+IBUS_CAP_PROPERTY           = 1 << 4
+IBUS_CAP_SURROUNDING_TEXT   = 1 << 5
+
+
 def create_imcontext():
     ic = IBusELInputContext(bus)
     try:
@@ -410,7 +418,13 @@ def create_imcontext():
     except ValueError:
         ic.id_no = len(imcontexts)
         imcontexts.append(ic)
-    ic.set_capabilities(int('101001' if use_surrounding_text else '001001',2))
+
+    caps = IBUS_CAP_FOCUS
+    # caps |= IBUS_CAP_PREEDIT_TEXT
+    if use_surrounding_text:
+        caps |= IBUS_CAP_SURROUNDING_TEXT
+
+    ic.set_capabilities(caps)
     print_command('ibus_create_imcontext_cb', ic.id_no)
 
 def destroy_imcontext(id_no):
