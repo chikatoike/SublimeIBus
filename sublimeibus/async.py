@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 import os
-import thread
 import subprocess
 import logging
+try:
+    import _thread as thread
+except ImportError:
+    import thread
 
 
 if os.name == "nt" and not hasattr(subprocess, 'STARTF_USESHOWWINDOW'):
@@ -127,7 +130,7 @@ class ProcessChat(object):
 
     def send(self, data):
         if self.async is not None:
-            return self.async.proc.stdin.write(data)
+            return self.async.proc.stdin.write(data.encode('utf-8'))
         else:
             raise
 
@@ -135,7 +138,7 @@ class ProcessChat(object):
         self.send(data)
 
     def handle_read(self, data):
-        buf = data
+        buf = data.decode('utf-8')
         terminator = self.get_terminator()
 
         while True:
