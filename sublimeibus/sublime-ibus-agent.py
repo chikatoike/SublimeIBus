@@ -500,7 +500,7 @@ def focus_in(id_no):
 
 def focus_out(id_no):
     imcontexts[id_no].focus_out()
-    print '{}'  # Dummy response
+    print('{}')  # Dummy response
 
 def reset(id_no):
     imcontexts[id_no].reset()
@@ -562,7 +562,7 @@ class IBusModeMainLoop(glib.MainLoop):
     def __stdin_cb(self, fd, condition):
         try:
             expr = sys.stdin.readline()
-            exec expr
+            exec(expr)
         except:
             import traceback
             print_command('error', 'error expr: ' + expr)

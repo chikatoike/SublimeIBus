@@ -4,7 +4,12 @@ import sublime_plugin
 import os
 import json
 from os.path import join
-from sublimeibus import host
+import sys
+
+BASE_PATH = os.path.abspath(os.path.dirname(__file__))
+sys.path += [BASE_PATH] + [join(BASE_PATH, 'sublimeibus')]
+
+from sublimeibus.host import agent
 
 
 class Logger(object):
@@ -190,9 +195,9 @@ def on_data(data):
             logger.debug(repr(data))
 
 
-host.agent.register_callback(on_data)
-host.agent.restart(join(os.getcwd(), 'sublimeibus'))
+agent.register_callback(on_data)
+agent.restart(join(BASE_PATH, 'sublimeibus'))
 
 status = IBusStatus()
-command = IBusCommand(host.agent)
+command = IBusCommand(agent)
 command.setup()
