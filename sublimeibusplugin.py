@@ -7,7 +7,8 @@ from os.path import join
 import sys
 
 BASE_PATH = os.path.abspath(os.path.dirname(__file__))
-sys.path += [BASE_PATH] + [join(BASE_PATH, 'sublimeibus')]
+if BASE_PATH not in sys.path:
+    sys.path += [BASE_PATH] + [join(BASE_PATH, 'sublimeibus')]
 
 from sublimeibus.host import agent
 
