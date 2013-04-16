@@ -42,6 +42,8 @@ Sublime Text 2 で iBus を使った日本語入力を可能にするパッケ�
   - python-dbus
   - python-xlib
 
+- x11-utils
+
 Ubuntu 12.10
 ------------
 Ubuntu 12.10 では、 iBus と ibus-anthy がデフォルトでインストールされているので、pythonパッケージに関しては以下のコマンドを実行すれば利用可能になります。 (Mozc等を利用する場合は別途 ibus-mozc 等をインストールする必要があります。)
