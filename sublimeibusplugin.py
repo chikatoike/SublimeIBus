@@ -136,7 +136,12 @@ class IBusCallback(object):
         pass
 
     def ibus_process_key_event_cb(self, id_no, handled):
-        pass
+        if handled == 0:
+            settings = sublime.load_settings('SublimeIBusFallBackCommand.sublime-settings')
+            cmd = settings.get(status.key)
+            if cmd is not None:
+                status.view.run_command(cmd.get('command', None),
+                                        cmd.get('args', None))
 
 
 class IbusToggleCommand(sublime_plugin.TextCommand):
@@ -159,6 +164,7 @@ class IbusKeyCommand(sublime_plugin.TextCommand):
 
         keysym = self.table.get(key, None)
         if keysym is not None:
+            status.key = key
             command.process_key(keysym)
 
 

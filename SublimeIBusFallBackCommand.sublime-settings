@@ -1,0 +1,12 @@
+{
+	"backspace": { "command": "left_delete" },
+	"left": { "command": "move", "args": {"by": "characters", "forward": false} },
+	"right": { "command": "move", "args": {"by": "characters", "forward": true} },
+	"up": { "command": "move", "args": {"by": "lines", "forward": false} },
+	"down": { "command": "move", "args": {"by": "lines", "forward": true} },
+	"enter": { "command": "insert", "args": {"characters": "\n"} },
+	"pageup": { "command": "move", "args": {"by": "pages", "forward": false} },
+	"pagedown": { "command": "move", "args": {"by": "pages", "forward": true} },
+	"home": { "command": "move_to", "args": {"to": "bol", "extend": false} },
+	"end": { "command": "move_to", "args": {"to": "eol", "extend": false} }
+}
