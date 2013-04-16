@@ -118,7 +118,7 @@
     // 29	Control_bracketright
     // 30	Control_asciicircum
     // 31	Control_underscore
-    "space": 32, // 32	space
+    " ": 32, // 32	space
     "!": 33, // 33	exclam
     "\"": 34, // 34	quotedbl
     "#": 35, // 35	numbersign
