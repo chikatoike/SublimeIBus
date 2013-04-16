@@ -17,7 +17,7 @@ class Logger(object):
         self.name = name
 
     def debug(self, log):
-        print(self.name + ':' + log)
+        print(self.name + ':' + str(log))
 
 
 # import logging
