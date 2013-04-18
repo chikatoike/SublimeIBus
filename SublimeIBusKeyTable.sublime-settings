@@ -177,9 +177,9 @@
     "X": 88, // 88	X
     "Y": 89, // 89	Y
     "Z": 90, // 90	Z
-    "{": 91, // 91	bracketleft
+    "[": 91, // 91	bracketleft
     "\\": 92, // 92	backslash
-    "}": 93, // 93	bracketright
+    "]": 93, // 93	bracketright
     "^": 94, // 94	asciicircum
     "_": 95, // 95	underscore
     "`": 96, // 96	grave
@@ -209,9 +209,9 @@
     "x": 120, // 120	x
     "y": 121, // 121	y
     "z": 122, // 122	z
-    "[": 123, // 123	braceleft
+    "{": 123, // 123	braceleft
     "|": 124, // 124	bar
-    "]": 125, // 125	braceright
+    "}": 125, // 125	braceright
     "~": 126, // 126	asciitilde
 
     "dummy": 0
