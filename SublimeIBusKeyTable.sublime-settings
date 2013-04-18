@@ -33,8 +33,8 @@
     "right": 65363,
     "down": 65364,
 
-    "prior": 65365,
-    "next": 65366,
+    "pageup": 65365,
+    "pagedown": 65366,
     "end": 65367,
     "begin": 65368,
     "select": 65376,
