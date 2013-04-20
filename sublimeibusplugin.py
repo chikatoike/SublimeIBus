@@ -89,8 +89,9 @@ class IBusCommand(object):
             self.push('disable(%d)' % status.id_no)
 
     def process_key(self, keysym):
-        self.push('process_key_event(0, %d, 0, None, None)' % keysym)
-        # self.push('set_surrounding_text(0, "", 0, 0)')
+        self.push('process_key_event(%d, %d, 0, None, None)' %
+                  (status.id_no, keysym))
+        # self.push('set_surrounding_text(%d, "", 0, 0)' % status.id_no)
 
     def set_cursor_location(self):
         if self.window_layout is None:
