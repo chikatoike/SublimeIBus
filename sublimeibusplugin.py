@@ -359,9 +359,6 @@ class IbusKeyCommand(sublime_plugin.TextCommand):
         if self.view.settings().get('is_widget'):
             return
 
-        # TODO Why required this?
-        command.set_status(True)
-
         keysym = self.table.get(key, None)
         if keysym is not None:
             status.key = key

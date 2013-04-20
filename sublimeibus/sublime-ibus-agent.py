@@ -119,7 +119,7 @@ if __name__ == "__main__":
                       action="store_true", dest="quit", default=False,
                       help="quit if ibus-daemon is not running")
     parser.add_option("-s", "--surrounding-text",
-                      action="store_true", dest="surrounding_text", default=True,
+                      action="store_true", dest="surrounding_text", default=False,
                       help="enable surrounding text support")
     options, args = parser.parse_args()
     if options.quit:
