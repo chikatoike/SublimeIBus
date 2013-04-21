@@ -33,8 +33,8 @@
     "right": 65363,
     "down": 65364,
 
-    "prior": 65365,
-    "next": 65366,
+    "pageup": 65365,
+    "pagedown": 65366,
     "end": 65367,
     "begin": 65368,
     "select": 65376,
@@ -118,7 +118,7 @@
     // 29	Control_bracketright
     // 30	Control_asciicircum
     // 31	Control_underscore
-    "space": 32, // 32	space
+    " ": 32, // 32	space
     "!": 33, // 33	exclam
     "\"": 34, // 34	quotedbl
     "#": 35, // 35	numbersign
@@ -177,9 +177,9 @@
     "X": 88, // 88	X
     "Y": 89, // 89	Y
     "Z": 90, // 90	Z
-    "{": 91, // 91	bracketleft
+    "[": 91, // 91	bracketleft
     "\\": 92, // 92	backslash
-    "}": 93, // 93	bracketright
+    "]": 93, // 93	bracketright
     "^": 94, // 94	asciicircum
     "_": 95, // 95	underscore
     "`": 96, // 96	grave
@@ -209,9 +209,9 @@
     "x": 120, // 120	x
     "y": 121, // 121	y
     "z": 122, // 122	z
-    "[": 123, // 123	braceleft
+    "{": 123, // 123	braceleft
     "|": 124, // 124	bar
-    "]": 125, // 125	braceright
+    "}": 125, // 125	braceright
     "~": 126, // 126	asciitilde
 
     "dummy": 0
