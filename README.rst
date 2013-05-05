@@ -137,7 +137,7 @@ Currently, this package is not yet registered on Package Control. Therefore, ple
 Usage
 =====
 
-Toggle ON/OFF with `ctrl+\`. After that, use iBus like normal.
+Toggle ON/OFF with `ctrl+\\`. After that, use iBus like normal.
 
 Issues/TODO
 ===========
