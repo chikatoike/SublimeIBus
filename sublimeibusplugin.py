@@ -343,6 +343,8 @@ class IBusCallback(object):
             if cmd is not None:
                 status.view.run_command(cmd.get('command', None),
                                         cmd.get('args', None))
+            elif len(status.key) == 1:
+                self.ibus_commit_text_cb(id_no, status.key)
 
 
 class IbusToggleCommand(sublime_plugin.TextCommand):
