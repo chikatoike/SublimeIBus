@@ -159,6 +159,7 @@
     {"keys": ["~"], "command": "ibus_key", "args": {"key": "~", "alt": false, "ctrl": false, "shift": false, "super": false}, "context": [{"key": "setting.ibus_mode"}, {"key": "setting.command_mode", "operand": false}]},
 
     {"keys": ["ctrl+m"], "command": "ibus_key", "args": {"key": "henkan", "alt": false, "ctrl": false, "shift": false, "super": false}, "context": [{"key": "setting.ibus_mode"}, {"key": "setting.command_mode", "operand": false}]},
-    { "keys": ["ctrl+\\"], "command": "ibus_toggle" }
+    { "keys": ["ctrl+\\"], "command": "ibus_toggle" },
+    { "keys": ["alt+z"], "command": "ibus_cycle" }
 
 ]
