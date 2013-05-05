@@ -346,6 +346,16 @@ class IBusCallback(object):
             elif len(status.key) == 1:
                 self.ibus_commit_text_cb(id_no, status.key)
 
+    def ibus_forward_key_event_cb(self, id_no, keyval, modifiers, is_released):
+        # Workaround for ibus-bogo as it uses fake backspaces instead of
+        # pre-editting.
+        #
+        # TODO This should be handled in a similar fashion to the unhandled case
+        # in `ibus_process_key_event_cb`. We also need a reverse lookup table of
+        # SublimeIBusKeyTable.sublime-settings.
+        if keyval == 65288:  # backspace
+            status.view.run_command('left_delete')
+
 
 class IbusToggleCommand(sublime_plugin.TextCommand):
     def run(self, edit):
