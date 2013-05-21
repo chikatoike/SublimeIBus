@@ -1,6 +1,7 @@
 ===========
 SublimeIBus
 ===========
+(English below)
 
 これは `ibus.el <http://www11.atwiki.jp/s-irie/pages/21.html>`_ を Sublime Text 2 に移植したものです。
 Sublime Text 2 で iBus を使った日本語入力を可能にするパッケージになる予定です。
@@ -91,4 +92,58 @@ uim に関してはよくわかりません。
 
 参考リンク
 ==========
+http://www.sublimetext.com/forum/viewtopic.php?f=3&t=7006&p=33169
+
+-------
+
+(English)
+
+This is a port of `ibus.el <http://www11.atwiki.jp/s-irie/pages/21.html>`_ to Sublime Text 2. It enables users to use iBus to input many languages into Sublime Text 2.
+
+Notice
+======
+
+This software is of alpha quality. Expect bugs.
+
+Targeted users
+==============
+- Sublime Text 2 users on Linux
+- People disatified with `InputHelper <https://github.com/xgenvn/InputHelper>`_
+- People using iBus in general. No support is provided for SCIM, uim or other IMs.
+
+System requirements
+===================
+
+- SublimeIBus (this software)
+- iBus
+- Python 2.7
+
+  Python 2.6 and before is unconfirmed.
+  Though Sublime Text 2 includes its own Python interpreter, a system version is still required.
+
+- Python packages
+
+  - python-ibus
+  - python-dbus
+  - python-xlib
+
+- x11-utils
+
+Installation
+============
+
+Currently, this package is not yet registered on Package Control. Therefore, please download the ZIP folder or use `git clone` to put this software into `~/.config/sublime-text-2/Packages`.
+
+Usage
+=====
+
+Toggle ON/OFF with `ctrl+\\`. After that, use iBus like normal.
+
+Issues/TODO
+===========
+
+- Separate input contexts for each tab
+
+Related discussion
+==================
 http://www.sublimetext.com/forum/viewtopic.php?f=3&t=7006&p=33169
