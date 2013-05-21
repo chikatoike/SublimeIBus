@@ -101,6 +101,9 @@ class IBusCommand(object):
         self.push('set_cursor_location(%d, %d, %d, 0, %d)' %
                   (status.id_no, left, top, height))
 
+    def next_engine(self):
+        self.push('next_engine(%d)' % (status.id_no))
+
 
 class WindowLayout:
     def __init__(self):
@@ -349,6 +352,12 @@ class IbusToggleCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         command.set_status(not status.enable)
         # logger.debug('enable = ' + str(enable))
+
+
+class IbusCycleCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        logger.debug("next_engine()")
+        command.next_engine()
 
 
 class IbusKeyCommand(sublime_plugin.TextCommand):

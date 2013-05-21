@@ -538,6 +538,16 @@ def stop_focus_observation():
 def list_active_engines():
     print_command('ibus_list_active_engines_cb', [i.name for i in bus.list_active_engines()])
 
+def next_engine(id_no):
+    current_engine_name = imcontexts[id_no].get_engine().name
+    all_engine_names = [i.name for i in bus.list_active_engines()]
+    current_engine_index = all_engine_names.index(current_engine_name)
+    try:
+        next_engine_name = all_engine_names[current_engine_index + 1]
+    except IndexError:
+        next_engine_name = all_engine_names[0]
+    set_engine(id_no, next_engine_name)
+
 ########################################################################
 # Main loop
 ########################################################################
